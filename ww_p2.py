@@ -92,6 +92,6 @@ def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_ARE
     return cv2.resize(image, dim, interpolation=inter)
 
 
-find_object('waldo_face.jpeg', 'puzzle2.jpeg')
+find_object('Target Images/waldo_face.jpeg', 'Puzzle Images/puzzle2.jpeg')
 
 
