@@ -3,7 +3,7 @@ UMGC CMSC 495 Current Trends Capstone Project comparing and researching Computer
 
 Contributors:
 
-Cody Ambrose
-Rodney French
-John Kaiser
-Orry Newell
+- Cody Ambrose
+- Rodney French
+- John Kaiser
+- Orry Newell
