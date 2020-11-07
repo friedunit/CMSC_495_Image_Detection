@@ -3,7 +3,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 
 
-def mySearch():
+def myPreview():
     print("Searching for {} in {}!".format(character_dd.get(), scene_dd.get()))
     if scene_dd.get() == "City":
         scene_label.configure(image=master.city)
@@ -52,18 +52,18 @@ master.resizable(0, 0)
 scene_dd = StringVar(master)
 scene_dd.set("Buffet")
 s_dd = OptionMenu(master, scene_dd, "Buffet", "Department Store", "City", "Siege")
-s_dd.pack(side=TOP, anchor=NW)
+s_dd.grid(row=0, column=0, sticky=W, pady=2)
 
 character_dd = StringVar(master)
 character_dd.set("Waldo")
 c_dd = OptionMenu(master, character_dd, "Waldo", "Wenda", "Wizard", "Odlaw", "Woof")
-c_dd.pack(side=TOP, anchor=NW)
+c_dd.grid(row=1, column=0, sticky=W, pady=2)
 
-search_b = Button(master, text="Search", command=mySearch)
-search_b.pack(side=TOP, anchor=NW)
+preview_b = Button(master, text="Preview", command=myPreview, width=20)
+preview_b.grid(row=0, column=1, sticky=W, pady=2)
 
-close_b = Button(master, text="Close", command=master.destroy)
-close_b.pack(side=TOP, anchor=NW)
+search_b = Button(master, text="Search", width=20)
+search_b.grid(row=1, column=1, sticky=W, pady=2)
 
 master.default = ImageTk.PhotoImage(resize_image(default_image, (800, 800)))
 master.city = ImageTk.PhotoImage(resize_image(city_image, (800, 800)))
@@ -72,7 +72,7 @@ master.department = ImageTk.PhotoImage(resize_image(department_image, (800, 800)
 master.siege = ImageTk.PhotoImage(resize_image(siege_image, (800, 800)))
 
 scene_label = Label(master, image=master.buffet)
-scene_label.pack(side=BOTTOM)
+scene_label.grid(row=2, column=0, columnspan=2, rowspan=1, sticky=W, pady=2)
 
 master.waldo = ImageTk.PhotoImage(resize_image(waldo_image, (200, 200)))
 master.odlaw = ImageTk.PhotoImage(resize_image(odlaw_image, (200, 200)))
@@ -81,6 +81,6 @@ master.wizard = ImageTk.PhotoImage(resize_image(wizard_image, (200, 200)))
 master.woof = ImageTk.PhotoImage(resize_image(woof_image, (200, 200)))
 
 character_label = Label(master, image=master.waldo)
-character_label.pack(side=TOP, anchor=NE)
+character_label.grid(row=2, column=3, sticky=W, pady=2)
 
 mainloop()
