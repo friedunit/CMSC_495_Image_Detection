@@ -8,18 +8,33 @@ from PIL import Image, ImageTk
 
 target_dict = {'Waldo': 'waldo_face.jpeg', 'Wenda': 'wenda.jpg', 'Wizard': 'wizard.jpg', 'Odlaw': 'odlaw.jpg',
                'Woof': 'woofs_tail.jpg'}
-puzzle_dict = {'Beach': 'puzzle3.jpeg', 'City': 'puzzle2.jpeg', 'Buffet': 'Waldo_Buffet.jpeg', 'Department Store': 'Waldo_Department_Store.jpeg',
-               'Siege': 'Waldo_Siege.jpeg'}
+puzzle_dict = {'Beach': 'puzzle3.jpeg', 'City': 'puzzle2.jpeg', 'Zoo': 'zoo.jpeg', 'Department Store': 'Waldo_Department_Store.jpeg',
+               'Ski Resort': 'ski.jpeg', 'Train Station': 'train.jpeg', 'Museum': 'museum.jpeg'}
 
 
 def my_preview():
     print("Searching for {} in {}!".format(character_dd.get(), scene_dd.get()))
     scene = scene_dd.get()
     character = character_dd.get()
-    master.show_scene = ImageTk.PhotoImage(resize_image(puzzle_images / puzzle_dict[scene], (800, 800)))
-    master.show_character = ImageTk.PhotoImage(resize_image(target_images / target_dict[character], (200, 200)))
+    scene_image = cv2.imread(str(puzzle_images / puzzle_dict[scene]))
+    scene_image = resize_with_aspect_ratio(scene_image, height=int(screen_height*0.8))
+    master.show_scene = process_image(scene_image)
+    target_image = cv2.imread(str(target_images / target_dict[character]))
+    target_image = resize_with_aspect_ratio(target_image, width=100)
+    master.show_character = process_image(target_image)
     scene_label.configure(image=master.show_scene)
     character_label.configure(image=master.show_character)
+    zoomed_label.grid_remove()
+
+
+def process_image(image):
+    # Convert image from openCV BGR to RGB for displaying
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    # Convert to PIL format
+    image = Image.fromarray(image)
+    # ImageTk format
+    image = ImageTk.PhotoImage(image)
+    return image
 
 
 def search_image(target_pic, puzzle_pic):
@@ -27,9 +42,6 @@ def search_image(target_pic, puzzle_pic):
     puzzle = cv2.imread(puzzle_pic)
     target_gray = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
     puzzle_gray = cv2.cvtColor(puzzle, cv2.COLOR_BGR2GRAY)
-    # target = cv2.Canny(target, int(max(0, (1.0 - 0.33) * np.median(target))), int(min(255, (1.0 - 0.33) *
-                                                                                      # np.median(target))))
-    # target = cv2.Canny(target, 100, 250)
     target_edge = cv2.adaptiveThreshold(target_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
     (height, width) = target.shape[:2]
     found = None
@@ -38,9 +50,6 @@ def search_image(target_pic, puzzle_pic):
         r = puzzle.shape[1] / float(resized.shape[1])
         if resized.shape[0] < height or resized.shape[1] < width:
             break
-        # edged = cv2.Canny(resized, int(max(0, (1.0 - 0.33) * np.median(puzzle))), int(min(255, (1.0 - 0.33) *
-                                                                                          # np.median(puzzle))))
-        # edged = cv2.Canny(resized, 225, 230)
         edged = cv2.adaptiveThreshold(resized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
         result = cv2.matchTemplate(edged, target_edge, cv2.TM_CCOEFF)
         (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(result)
@@ -58,19 +67,13 @@ def search_image(target_pic, puzzle_pic):
     puzzle = cv2.rectangle(puzzle, (startX, startY), (endX, endY), (0, 255, 0), 3)
     zoomed = puzzle[startY-100:endY+100, startX-100:endX+100]
     resize = resize_with_aspect_ratio(puzzle, height=int(screen_height*0.8))
-    # convert from openCV BGR to RGB for displaying images
-    resize = cv2.cvtColor(resize, cv2.COLOR_BGR2RGB)
-    target = cv2.cvtColor(target, cv2.COLOR_BGR2RGB)
-    zoomed = cv2.cvtColor(zoomed, cv2.COLOR_BGR2RGB)
-    resize = Image.fromarray(resize)
-    master.show_scene = ImageTk.PhotoImage(resize)
+    master.show_scene = process_image(resize)
     target = resize_with_aspect_ratio(target, width=100)
-    target = Image.fromarray(target)
-    master.show_character = ImageTk.PhotoImage(target)
-    zoomed = Image.fromarray(zoomed)
-    master.show_zoomed = ImageTk.PhotoImage(zoomed)
+    master.show_character = process_image(target)
+    master.show_zoomed = process_image(zoomed)
     scene_label.configure(image=master.show_scene)
     character_label.configure(image=master.show_character)
+    zoomed_label.grid(row=2, column=3, sticky=S, pady=2)
     zoomed_label.configure(image=master.show_zoomed)
 
 
@@ -90,10 +93,10 @@ def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_ARE
     return cv2.resize(image, dim, interpolation=inter)
 
 
-def resize_image(image_location, size_set):
-    image = Image.open(image_location)
-    image = image.resize(size_set, Image.ANTIALIAS)
-    return image
+# def resize_image(image_location, size_set):
+#     image = Image.open(image_location)
+#     image = image.resize(size_set, Image.ANTIALIAS)
+#     return image
 
 
 master = Tk()
@@ -105,7 +108,7 @@ master.geometry(f'{screen_width}x{screen_height}')
 master.resizable(0, 0)
 
 scene_dd = StringVar(master)
-scene_dd.set('Buffet')
+scene_dd.set('City')
 s_dd = OptionMenu(master, scene_dd, *puzzle_dict.keys())
 s_dd.grid(row=0, column=0, sticky=W, pady=2)
 
@@ -136,12 +139,16 @@ preview_b.grid(row=0, column=1, sticky=W, pady=2)
 search_b = Button(master, text="Search", command=lambda: search_image(get_character(), get_scene()), width=20)
 search_b.grid(row=1, column=1, sticky=W, pady=2)
 
-master.default = ImageTk.PhotoImage(resize_image(puzzle_images / puzzle_dict['Buffet'], (800, 800)))
+default_image = cv2.imread(str(puzzle_images / puzzle_dict['City']))
+default_image = resize_with_aspect_ratio(default_image, height=int(screen_height*0.8))
+master.default = process_image(default_image)
 
 scene_label = Label(master, image=master.default)
 scene_label.grid(row=2, column=0, columnspan=2, rowspan=1, sticky=W, pady=2)
 
-master.waldo = ImageTk.PhotoImage(resize_image(target_images / target_dict['Waldo'], (200, 200)))
+waldo_image = cv2.imread(str(target_images / target_dict['Waldo']))
+waldo_image = resize_with_aspect_ratio(waldo_image, width=100)
+master.waldo = process_image(waldo_image)
 
 character_label = Label(master, image=master.waldo)
 character_label.grid(row=2, column=3, sticky=NW, pady=2)
