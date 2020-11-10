@@ -1,4 +1,4 @@
-from datetime import datetime as dt
+
 import cv2
 import numpy as np
 from pathlib import Path
@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 
 target_dict = {'Waldo': 'waldo_face.jpeg', 'Wenda': 'wenda.jpg', 'Wizard': 'wizard.jpg', 'Odlaw': 'odlaw.jpg',
                'Woof': 'woofs_tail.jpg'}
+
 puzzle_dict = {'Beach': 'puzzle3.jpeg', 'City': 'puzzle2.jpeg', 'Zoo': 'zoo.jpeg', 'Department Store': 'Waldo_Department_Store.jpeg',
                'Ski Resort': 'ski.jpeg', 'Train Station': 'train.jpeg', 'Museum': 'museum.jpeg'}
 
@@ -50,6 +51,7 @@ def search_image(target_pic, puzzle_pic):
         r = puzzle.shape[1] / float(resized.shape[1])
         if resized.shape[0] < height or resized.shape[1] < width:
             break
+
         edged = cv2.adaptiveThreshold(resized, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
         result = cv2.matchTemplate(edged, target_edge, cv2.TM_CCOEFF)
         (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(result)
@@ -73,8 +75,8 @@ def search_image(target_pic, puzzle_pic):
     master.show_zoomed = process_image(zoomed)
     scene_label.configure(image=master.show_scene)
     character_label.configure(image=master.show_character)
-    zoomed_label.grid(row=2, column=3, sticky=S, pady=2)
     zoomed_label.configure(image=master.show_zoomed)
+    zoomed_label.grid(row=2, column=3, sticky=S, pady=2)
 
 
 def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_AREA):
@@ -93,12 +95,6 @@ def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_ARE
     return cv2.resize(image, dim, interpolation=inter)
 
 
-# def resize_image(image_location, size_set):
-#     image = Image.open(image_location)
-#     image = image.resize(size_set, Image.ANTIALIAS)
-#     return image
-
-
 master = Tk()
 
 master.title("Where's Waldo Application")
@@ -108,6 +104,7 @@ master.geometry(f'{screen_width}x{screen_height}')
 master.resizable(0, 0)
 
 scene_dd = StringVar(master)
+
 scene_dd.set('City')
 s_dd = OptionMenu(master, scene_dd, *puzzle_dict.keys())
 s_dd.grid(row=0, column=0, sticky=W, pady=2)
@@ -119,10 +116,8 @@ c_dd.grid(row=1, column=0, sticky=W, pady=2)
 
 # imported pathlib to deal with file paths on Windows and Mac/Linux
 puzzle_images = Path('Puzzle Images')
-# scene_image = puzzle_images / puzzle_dict[scene_dd.get()]
 
 target_images = Path('Target Images')
-# character_image = target_images / target_dict[character_dd.get()]
 
 
 def get_scene():
@@ -155,6 +150,5 @@ character_label.grid(row=2, column=3, sticky=NW, pady=2)
 
 zoomed_label = Label(master)
 zoomed_label.grid(row=2, column=3, sticky=S, pady=2)
-
 
 mainloop()
