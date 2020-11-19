@@ -68,7 +68,7 @@ def search_image(mst, target_pic, puzzle_pic, scene_label, character_label, zoom
     found = None
     # np.linspace(start, stop, number) returns a list of 'number' evenly spaced numbers between start and stop
     # the list slicing [::-1] goes in reverse to start with the largest scale to the smallest
-    for scale in np.linspace(0.7, 1.3, 10)[::-1]:
+    for scale in np.linspace(0.5, 2.0, 10)[::-1]:
         # resize the grayscale puzzle image for each scale in the list
         resized = resize_with_aspect_ratio(puzzle_gray, width=int(puzzle.shape[1] * scale))
         # set ratio to puzzle width divided by resized width
