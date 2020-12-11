@@ -193,7 +193,6 @@ if __name__ == '__main__':
                    'Odlaw': 'odlaw.jpg'}
 
     puzzle_dict = {'': '', 'Beach': 'puzzle3.jpeg', 'City': 'puzzle2.jpeg', 'Zoo': 'zoo.jpeg',
-                   'Department Store': 'Waldo_Department_Store.jpeg',
                    'Ski Resort': 'ski.jpeg', 'Train Station': 'train.jpeg', 'Museum': 'museum.jpeg'}
     puzzle_images = Path('Puzzle Images')
 
